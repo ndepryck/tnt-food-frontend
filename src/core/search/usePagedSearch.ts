@@ -6,40 +6,64 @@ import type { Page } from "./contract";
 export function usePagedSearch<T, Q>(
   fetchPage: (query: Q, offset: number, signal: AbortSignal) => Promise<Page<T>>,
   query: Q,
+  validation = 0,
 ) {
   const active = useRef<AbortController | null>(null);
   const [items, setItems] = useState<T[]>([]);
   const [loadedQuery, setLoadedQuery] = useState<Q>();
   const [next, setNext] = useState<number | null>(null);
-  const [failedOffset, setFailedOffset] = useState<number | null>(null);
+  const [failed, setFailed] = useState<{ offset: number; count: number } | null>(null);
+  const depth = useRef(0);
   const [pending, setPending] = useState(true);
-  const request = useCallback(async (offset: number) => {
+  const [revision, setRevision] = useState(0);
+  const request = useCallback(async (offset: number, count = 1) => {
     active.current?.abort();
     const controller = new AbortController();
     active.current = controller;
     setPending(true);
-    setFailedOffset(null);
-    if (!offset) setNext(null);
+    setFailed(null);
     try {
-      const page = await fetchPage(query, offset, controller.signal);
-      if (controller.signal.aborted) return;
-      setItems(old => offset ? [...old, ...page.items] : page.items);
+      // Rebuild the visible page chain atomically. Never splice a new
+      // first page onto old offsets, even if a later read fails.
+      const rows: T[] = [];
+      let cursor: number | null = offset;
+      let pages = 0;
+      do {
+        const page: Page<T> = await fetchPage(query, cursor, controller.signal);
+        if (controller.signal.aborted) return;
+        rows.push(...page.items);
+        cursor = page.hasMore ? page.nextOffset : null;
+        pages++;
+      } while (cursor !== null && pages < count);
+      depth.current = offset ? depth.current + pages : pages;
+      setItems(old => offset ? [...old, ...rows] : rows);
       setLoadedQuery(query);
-      setNext(page.hasMore ? page.nextOffset : null);
+      setNext(cursor);
     } catch {
-      if (!controller.signal.aborted) setFailedOffset(offset);
+      if (!controller.signal.aborted) setFailed({ offset, count });
     } finally {
       if (!controller.signal.aborted) setPending(false);
     }
   }, [fetchPage, query]);
+  const previousValidation = useRef(validation);
   useLayoutEffect(() => {
-    void request(0);
+    const verifying = validation !== previousValidation.current;
+    previousValidation.current = validation;
+    if (!verifying) {
+      depth.current = 0;
+      setNext(null);
+    }
+    void request(0, verifying ? Math.max(1, depth.current) : 1);
     return () => active.current?.abort();
-  }, [request]);
+  }, [request, revision, validation]);
   return {
-    items, current: loadedQuery === query, pending, failed: failedOffset !== null,
-    continuation: (failedOffset ?? next ?? 0) > 0,
-    action: failedOffset !== null ? () => request(failedOffset)
+    items, current: loadedQuery === query, pending, failed: failed !== null,
+    refresh(reconcile: (rows: T[]) => T[]) {
+      setItems(reconcile);
+      setRevision(n => n + 1);
+    },
+    continuation: (failed?.offset ?? next ?? 0) > 0,
+    action: failed ? () => request(failed.offset, failed.count)
       : next !== null && loadedQuery === query ? () => request(next) : null,
   };
 }

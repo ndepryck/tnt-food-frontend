@@ -20,6 +20,7 @@ Implementation walkthroughs:
 1. [Navigation and API reads](docs/reviews/01-navigation-and-api.md)
 2. [Catalogue and live filters](docs/reviews/02-catalogue-and-filters.md)
 3. [Recipe detail: ingredients and preparation](docs/reviews/03-recipe-detail.md)
+4. [Create, edit, and delete a recipe](docs/reviews/04-recipe-writes.md)
 
 For local services and test commands, see [Testing](docs/testing.md).
 

@@ -25,7 +25,7 @@ export function IngredientPicker({ excluded, choose, close }: {
     node.showModal();
     return () => node.close();
   }, []);
-  return <dialog ref={dialog} aria-labelledby={title} onCancel={e => { e.preventDefault(); close(); }}>
+  return <dialog className="ingredient-picker" ref={dialog} aria-labelledby={title} onCancel={e => { e.preventDefault(); close(); }}>
     <h2 id={title}>Choisir un ingrédient</h2>
     <label>Rechercher un ingrédient
       <input ref={input} autoFocus value={text} onChange={e => setText(e.target.value)} />

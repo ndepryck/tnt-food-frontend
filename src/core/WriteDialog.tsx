@@ -1,0 +1,80 @@
+import { useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import { HttpError } from "./http";
+import { IconButton } from "./IconButton";
+
+interface Props {
+  title: string; submitLabel: string; failure: string; close: () => void;
+  write: () => Promise<void>;
+  fields?: (pending: boolean) => ReactNode;
+  confirmation?: string;
+  fallback?: RefObject<HTMLElement | null>;
+}
+
+// Save and confirmation dialogs share locking, feedback, dismissal and focus.
+export function WriteDialog({ title, submitLabel, failure, close, write, fields, confirmation, fallback }: Props) {
+  const titleId = useId();
+  const messageId = useId();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const lock = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  useLayoutEffect(() => {
+    const node = dialog.current!;
+    const invoker = document.activeElement;
+    node.showModal();
+    (node.querySelector<HTMLElement>("[data-initial-focus]") ?? node).focus();
+    return () => {
+      node.close();
+      if (invoker instanceof HTMLElement && invoker.isConnected) invoker.focus();
+      else fallback?.current?.focus();
+    };
+  }, [fallback]);
+
+  const cancel = () => { if (!lock.current) close(); };
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (lock.current) return;
+    const form = event.currentTarget;
+    const blank = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input[required], textarea[required]")]
+      .find(field => !field.value.trim());
+    if (blank) {
+      setError(`Veuillez renseigner le champ « ${blank.labels?.[0]?.firstChild?.textContent?.trim() ?? ""} ».`);
+      blank.focus();
+      return;
+    }
+    lock.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await write();
+    } catch (cause) {
+      setError(cause instanceof HttpError && cause.status === 404 ? "Cet élément n’existe plus." :
+        cause instanceof HttpError && cause.status === 422 ? "Les données sont invalides. Vérifiez les champs." :
+        `${failure} Veuillez réessayer.`);
+      lock.current = false;
+      setBusy(false);
+    }
+  }
+  return <dialog className="write-dialog" ref={dialog} aria-labelledby={titleId} aria-describedby={confirmation ? messageId : undefined}
+    onCancel={event => { event.preventDefault(); cancel(); }}
+    onKeyDown={event => {
+      if (event.key === "Escape") { event.preventDefault(); cancel(); }
+      if (event.key !== "Tab") return;
+      const controls = event.currentTarget.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled)");
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }}>
+    <div className="dialog-top"><h2 id={titleId}>{title}</h2><IconButton icon="close" label="Fermer" blocked={busy} onClick={cancel} /></div>
+    <form noValidate onSubmit={submit}>
+      {fields?.(busy)}
+      {confirmation && <p id={messageId}>{confirmation}</p>}
+      {error && <p role="alert">{error}</p>}
+      {busy && <p role="status">Opération en cours…</p>}
+      <div className="dialog-actions">
+        <button type="button" className="outline" data-initial-focus={confirmation ? true : undefined} aria-disabled={busy} onClick={cancel}>Annuler</button>
+        <button type="submit" aria-disabled={busy}>{submitLabel}</button>
+      </div>
+    </form>
+  </dialog>;
+}

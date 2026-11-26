@@ -22,7 +22,6 @@ main:has(> .catalogue) { max-width: 90rem; padding-inline: clamp(1rem, 3.8vw, 4r
 .filter-row input[type=radio] { accent-color: var(--terracotta); }
 .chip { display: inline-flex; align-items: center; padding-inline-start: .85rem; background: color-mix(in srgb, var(--olive) 12%, var(--cream)); border-radius: 2rem; max-width: 100%; box-sizing: border-box; }
 .remove { position: relative; flex: none; width: 44px; min-height: 44px; padding: 0; color: var(--olive); background: transparent; font-size: 1.35rem; }
-.tooltip { display: none; position: absolute; z-index: 1; top: 100%; right: 0; width: max-content; max-width: min(14rem, 70vw); padding: .35rem .6rem; color: var(--cream); background: var(--olive); font-size: .85rem; border-radius: .3rem; }
 .remove:hover .tooltip, .remove:focus-visible .tooltip { display: block; }
 .recipe-grid, .suggestions { padding: 0; list-style: none; }
 .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(100%,17rem),1fr)); gap: 1rem; }
@@ -34,12 +33,13 @@ main:has(> .catalogue) { max-width: 90rem; padding-inline: clamp(1rem, 3.8vw, 4r
 .recipe-grid a:hover h2, .recipe-grid a:focus-visible h2 { text-decoration: underline; }
 .recipe-grid img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: .8rem; }
 .recipe-grid h2 { font: bold 1.4rem Georgia, serif; margin: 0; padding: .8rem 1rem 1rem; }
-.catalogue dialog { width: min(24rem,calc(100% - 4rem)); height: min(36rem, 78dvh); }
-.catalogue dialog[open] { display: flex; flex-direction: column; align-items: stretch; }
+.ingredient-picker { width: min(24rem,calc(100% - 4rem)); height: min(36rem, 78dvh); }
+.ingredient-picker[open] { display: flex; flex-direction: column; align-items: stretch; }
 .picker-results { flex: 1; min-height: 3rem; overflow-y: auto; scrollbar-gutter: stable; }
 .catalogue-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .catalogue dialog h2 { margin-top: 0; font-family: Georgia, serif; }
 .catalogue dialog input { display: block; width: 100%; }
 .catalogue dialog::backdrop { background: color-mix(in srgb, var(--olive) 45%, transparent); }
-.catalogue dialog .outline { align-self: flex-start; margin-top: 1rem; }
+.ingredient-picker .outline { align-self: flex-start; margin-top: 1rem; }
+.recipe-grid .recipe-actions { margin-inline: .85rem; border-top: var(--rule); }
 .suggestions button { width: 100%; margin-bottom: .35rem; text-align: left; background: transparent; color: inherit; border: var(--rule); }

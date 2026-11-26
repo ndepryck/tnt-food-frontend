@@ -8,7 +8,8 @@ main:has(> .recipe-detail) { padding-top: clamp(1rem, 2.5vw, 2.5rem); }
   --detail-rule: 1px solid color-mix(in srgb, var(--olive) 24%, transparent);
   font: 1.15rem/1.45 Georgia, serif;
 }
-.recipe-detail > a { color: var(--terracotta); }
+.detail-tools { display: flex; justify-content: space-between; align-items: center; }
+.detail-tools a { color: var(--terracotta); }
 .recipe-summary, .recipe-sections { display: grid; gap: clamp(1rem, 3vw, 2rem); }
 .recipe-summary { align-items: center; padding-bottom: 1.5rem; border-bottom: var(--detail-rule); }
 .recipe-summary h1 { margin: 0; font-size: clamp(2.5rem, 6vw, 5.75rem); line-height: 1.08; }

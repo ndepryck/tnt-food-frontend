@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { searchRecipes } from "./api";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { searchRecipes, type Recipe } from "./api";
+import { RecipeButtons, RecipeDialog, type RecipeAction } from "./RecipeActions";
+import { useWriteArrivalFocus } from "./writeNavigation";
 import { catalogueQuery, remember, restore, sorts, type Controls } from "./catalogueQuery";
 import { IngredientPicker } from "./IngredientPicker";
 import { PageAction } from "./PageAction";
@@ -13,13 +15,29 @@ function RemoveButton({ label, remove }: { label: string; remove: () => void }) 
   </button>;
 }
 
-export function Catalogue() {
+function RecipeCard({ recipe, open, fallback }: {
+  recipe: Recipe; open: (action: RecipeAction) => void; fallback: RefObject<HTMLInputElement | null>;
+}) {
+  const row = useRef<HTMLLIElement>(null);
+  useLayoutEffect(() => {
+    const node = row.current;
+    return () => { if (node?.contains(document.activeElement)) fallback.current?.focus(); };
+  }, [fallback]);
+  return <li ref={row}><a href={`/recipes/${recipe.id}`}>
+    <img src={placeholder} alt="" /><h2>{recipe.name}</h2>
+  </a><RecipeButtons recipe={recipe} open={open} /></li>;
+}
+
+export function Catalogue({ validation = 0 }: { validation?: number }) {
   const [controls, setControls] = useState(restore);
   const [draft, setDraft] = useState(controls.text);
   const [picker, setPicker] = useState(false);
   const add = useRef<HTMLButtonElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const [action, setAction] = useState<RecipeAction | null>(null);
+  useWriteArrivalFocus(heading);
   useEffect(() => { remember(controls); }, [controls]);
   useEffect(() => {
     if (draft === controls.text) return;
@@ -27,9 +45,9 @@ export function Catalogue() {
     return () => window.clearTimeout(timer);
   }, [draft, controls.text]);
   const query = useMemo(() => catalogueQuery(controls), [controls]);
-  const results = usePagedSearch(searchRecipes, query);
+  const results = usePagedSearch(searchRecipes, query, validation);
   return <section className="catalogue">
-    <h1>Recettes</h1>
+    <h1 ref={heading} tabIndex={-1}>Recettes</h1>
     <div className="search-row">
       <div className="search-box">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -41,7 +59,7 @@ export function Catalogue() {
           setDraft(""); setControls(c => ({ ...c, text: "" })); input.current?.focus();
         }} />}
       </div>
-      <button disabled>+ Nouvelle recette</button>
+      <button aria-haspopup="dialog" onClick={e => { e.currentTarget.focus(); setAction({ kind: "create" }); }}>+ Nouvelle recette</button>
     </div>
     <div className="filter-row">
       <button ref={add} className="outline" aria-haspopup="dialog" onClick={e => { e.currentTarget.focus(); setPicker(true); }}>+ Ingrédient</button>
@@ -73,10 +91,14 @@ export function Catalogue() {
         <p>{query.filter ? "Aucune recette ne correspond à ces filtres." : "Aucune recette."}</p>}
     </div>
     {results.failed && <p role="alert">Impossible de charger les recettes.</p>}
+    {action && <RecipeDialog action={action} fallback={input} close={() => setAction(null)} changed={saved => {
+      if (action.kind !== "create") {
+        results.refresh(rows => rows.flatMap(row => row.id !== action.recipe.id ? [row] : saved ? [saved] : []));
+      }
+      setAction(null);
+    }} />}
     <ul ref={list} className="recipe-grid" aria-label="Résultats des recettes">{results.items.map(r =>
-      <li key={r.id}><a href={`/recipes/${r.id}`}>
-        <img src={placeholder} alt="" /><h2>{r.name}</h2>
-      </a></li>)}</ul>
+      <RecipeCard key={r.id} recipe={r} open={setAction} fallback={input} />)}</ul>
     <PageAction results={results} query={query} list={list} fallback={input} label="Plus de recettes" />
   </section>;
 }

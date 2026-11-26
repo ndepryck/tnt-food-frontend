@@ -1,10 +1,28 @@
-import { requestJson } from "../../core/http";
+import { request, requestJson } from "../../core/http";
 import type { Page, Search } from "../../core/search/contract";
 import { searchEndpoint } from "../../core/search/searchEndpoint";
 
 export interface Recipe { id: string; name: string; description: string }
 
 const recipes = "/v1/recipes/recipes";
+
+export type CreateRecipeRequest = Pick<Recipe, "name" | "description">;
+export type UpdateRecipeRequest = Partial<CreateRecipeRequest>;
+
+function jsonWrite(method: "POST" | "PATCH", body: unknown): RequestInit {
+  return { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+}
+export async function createRecipe(fields: CreateRecipeRequest) {
+  const [created] = await requestJson<Recipe[]>(recipes, jsonWrite("POST", [fields]));
+  if (!created?.id) throw new Error("Missing created recipe");
+  return created;
+}
+export function updateRecipe(id: string, fields: UpdateRecipeRequest) {
+  return requestJson<Recipe>(`${recipes}/${encodeURIComponent(id)}`, jsonWrite("PATCH", fields));
+}
+export async function deleteRecipe(id: string): Promise<void> {
+  await request(`${recipes}/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
 
 export interface Ingredient { id: string; name: string }
 export type RecipeSearch = Search<"name" | "description" | "ingredientName", "id", "name" | "description">;
