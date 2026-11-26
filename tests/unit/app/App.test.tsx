@@ -30,11 +30,17 @@ test("Given the catalogue is offline, When I retry after recovery, Then I see th
 });
 
 test("Given a recipe request failed, When I retry, Then the recipe title and description appear", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response(null, { status: 503 })).mockResolvedValueOnce(Response.json(recipe)));
+  let attempts = 0;
+  vi.stubGlobal("fetch", async (url: string) => {
+    if (url.includes("/ingredients?")) return Response.json({ items: [], hasMore: false });
+    if (url.endsWith("/steps")) return Response.json([]);
+    return attempts++ ? Response.json(recipe) : new Response(null, { status: 503 });
+  });
   history.replaceState(null, "", `/recipes/${recipe.id}`);
   render(<App />);
   await userEvent.click(await screen.findByRole("button", { name: "Réessayer" }));
   await screen.findByRole("heading", { name: recipe.name });
+  expect(screen.getByRole("link", { name: "← Recettes" }).getAttribute("href")).toBe("/recipes");
   screen.getByText(recipe.description);
 });
 
@@ -43,6 +49,26 @@ test("Given a deleted recipe, When I open its URL, Then I see a missing-recipe h
   history.replaceState(null, "", `/recipes/${recipe.id}`);
   render(<App />);
   await screen.findByRole("heading", { name: "Recette introuvable" });
+  expect(document.activeElement).toBe(document.body);
   expect(screen.getByRole("link", { name: "Retour au catalogue" }).getAttribute("href")).toBe("/recipes");
   expect(screen.queryByRole("button", { name: "Réessayer" })).toBeNull();
+});
+
+test.each([false, true])("Given a pending recipe retry, When it returns 404 (focus moved: %s), Then focus remains with the reader", async moved => {
+  let attempts = 0;
+  let finish!: (response: Response) => void;
+  vi.stubGlobal("fetch", async (url: string) => {
+    if (url.includes("/ingredients?")) return Response.json({ items: [], hasMore: false });
+    if (url.endsWith("/steps")) return Response.json([]);
+    return attempts++ ? new Promise<Response>(resolve => { finish = resolve; }) : new Response(null, { status: 503 });
+  });
+  history.replaceState(null, "", `/recipes/${recipe.id}`);
+  render(<App />);
+  await userEvent.click(await screen.findByRole("button", { name: "Réessayer" }));
+  expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Recette" }));
+  const navLink = screen.getByRole("link", { name: "Recettes" });
+  if (moved) navLink.focus();
+  finish(new Response(null, { status: 404 }));
+  const missing = await screen.findByRole("heading", { name: "Recette introuvable" });
+  expect(document.activeElement).toBe(moved ? navLink : missing);
 });

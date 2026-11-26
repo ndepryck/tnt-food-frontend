@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 interface Props {
   results: { pending: boolean; failed: boolean; continuation: boolean; action: (() => Promise<void>) | null };
-  query: object;
+  query: object | string;
   list: RefObject<HTMLUListElement | null>;
   fallback: RefObject<HTMLElement | null>;
   label: string;
@@ -17,7 +17,7 @@ export function PageAction({ results, query, list, fallback, label }: Props) {
     if (!intent || results.pending) return;
     if (intent.query === query && !results.failed && document.activeElement === button.current) {
       const row = list.current?.children[intent.index] as HTMLElement | undefined;
-      const appended = row?.querySelector<HTMLElement>("a, button");
+      const appended = row?.hasAttribute("tabindex") ? row : row?.querySelector<HTMLElement>("a, button");
       // A page of entirely excluded ingredients can have no focusable results.
       if (appended) appended.focus();
       else if (!results.action) fallback.current?.focus();
