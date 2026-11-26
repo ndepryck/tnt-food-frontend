@@ -75,13 +75,54 @@ test("Given an empty recipe, When I append, insert, drag, edit, reposition and d
     );
     await page.mouse.up();
     await checkOrder("Servir.", "Mélanger.");
-    await button("Modifier l’étape 2").click();
-    await page.getByLabel("Instruction").fill("Mixer.");
-    await submit("Enregistrer").click();
+    await test.step("Given rendered steps, When the real GET after an edit is held, Then the old rows stay in place with writes locked", async () => {
+      const rows = prep.locator(".step-instruction");
+      const oldRow = await rows.nth(1).elementHandle();
+      assert(oldRow, "Expected the second step before editing.");
+      const edit = button("Modifier l’étape 2");
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      // Delay forwarding the browser's GET; the backend still supplies its
+      // actual response once the test releases it.
+      await page.route(
+        `**${route}/steps`,
+        async (intercepted) => {
+          if (intercepted.request().method() === "GET") await gate;
+          await intercepted.continue();
+        },
+        { times: 1 },
+      );
+      try {
+        await edit.click();
+        await page.getByLabel("Instruction").fill("Mixer.");
+        await submit("Enregistrer").click();
+        await expect(
+          prep
+            .getByRole("status")
+            .filter({ hasText: "Actualisation des étapes…" }),
+        ).toBeVisible();
+        await expect(rows).toHaveText(["1.Servir.", "2.Mélanger."]);
+        expect(await oldRow.evaluate((row) => row.isConnected)).toBe(true);
+        await expect(button("Ajouter une étape")).toBeDisabled();
+        await expect(edit).toBeFocused();
+      } finally {
+        release();
+      }
+      await expect(rows).toHaveText(["1.Servir.", "2.Mixer."]);
+      await expect(edit).toBeFocused();
+      await expect(button("Ajouter une étape")).toBeEnabled();
+    });
     await checkOrder("Servir.", "Mixer.");
-    await button("Modifier l’étape 2").press("Enter");
-    await page.getByLabel("Position", { exact: true }).fill("1");
+    await button("Modifier l’étape 1").press("Enter");
+    await page.getByLabel("Position", { exact: true }).fill("2");
     await submit("Enregistrer").press("Enter");
+    await expect(prep.locator(".step-instruction")).toHaveText([
+      "1.Mixer.",
+      "2.Servir.",
+    ]);
+    await expect(button("Modifier l’étape 2")).toBeFocused();
     await checkOrder("Mixer.", "Servir.");
     await button("Supprimer l’étape 1").click();
     await expect(page.getByRole("dialog")).toContainText("Mixer.");

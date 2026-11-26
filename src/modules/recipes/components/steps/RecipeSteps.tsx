@@ -1,7 +1,7 @@
 import {
   type RefObject,
   useCallback,
-  useLayoutEffect,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -15,28 +15,18 @@ import {
 import { recipeVisits } from "../../navigation/recipeHistory";
 import { type StepAction, StepDialog } from "./StepDialog";
 import { StepList } from "./StepList";
+import "./steps.css";
+
+const readFeedbackDelay = 200;
 
 export function RecipeSteps({ id }: { id: string }) {
   const heading = useRef<HTMLHeadingElement>(null);
-  const [revision, setRevision] = useState(0);
-  useLayoutEffect(() => {
-    if (revision && document.activeElement === document.body)
-      heading.current?.focus();
-  }, [revision]);
   return (
-    <section aria-labelledby="step-heading">
+    <section className="recipe-steps" aria-labelledby="step-heading">
       <h2 id="step-heading" tabIndex={-1} ref={heading}>
         Préparation
       </h2>
-      <StepEditor
-        key={revision}
-        id={id}
-        heading={heading}
-        changed={() => {
-          recipeVisits.written(id);
-          setRevision((n) => n + 1);
-        }}
-      />
+      <StepEditor key={id} id={id} heading={heading} />
     </section>
   );
 }
@@ -44,24 +34,48 @@ export function RecipeSteps({ id }: { id: string }) {
 function StepEditor({
   id,
   heading,
-  changed,
 }: {
   id: string;
   heading: RefObject<HTMLHeadingElement | null>;
-  changed: () => void;
 }) {
   const load = useCallback(
     (signal: AbortSignal) => readSteps(id, signal),
     [id],
   );
-  const { state, retry } = useRead(load);
+  const { state, pending, retry } = useRead(load);
+  const [showReadStatus, setShowReadStatus] = useState(false);
+  useEffect(() => {
+    if (!pending) {
+      setShowReadStatus(false);
+      return;
+    }
+    const timer = window.setTimeout(
+      () => setShowReadStatus(true),
+      readFeedbackDelay,
+    );
+    return () => window.clearTimeout(timer);
+  }, [pending]);
+
+  const steps = state.status === "ready" ? state.data : undefined;
+  const readFailed =
+    !pending &&
+    (state.status === "error" ||
+      (state.status === "ready" && state.refreshFailed === true));
   const [action, setAction] = useState<StepAction | null>(null);
   const [moving, setMoving] = useState(false);
   const [failed, setFailed] = useState<{ step: Step; position: number } | null>(
     null,
   );
+  const blocked = pending || readFailed || moving;
+  function changed() {
+    recipeVisits.written(id);
+    retry();
+    setAction(null);
+    setMoving(false);
+  }
+
   async function move(step: Step, position: number) {
-    if (moving || action) return;
+    if (blocked || action) return;
     setMoving(true);
     setFailed(null);
     heading.current?.focus({ preventScroll: true });
@@ -74,57 +88,70 @@ function StepEditor({
     }
   }
   function open(action: StepAction) {
+    if (blocked) return;
     setFailed(null);
     setAction(action);
   }
-  if (state.status === "loading")
-    return <p role="status">Chargement des étapes…</p>;
-  if (state.status === "error")
-    return (
-      <RequestError
-        message="Impossible de charger les étapes."
-        retry={() => {
-          heading.current?.focus();
-          retry();
-        }}
-      />
-    );
   return (
     <>
-      {state.data.length ? (
-        <StepList
-          steps={state.data}
-          blocked={moving}
-          move={move}
-          edit={(step) => open({ kind: "edit", step })}
-          remove={(step) => open({ kind: "delete", step })}
-        />
-      ) : (
-        <p>Aucune étape.</p>
+      {steps && (
+        <>
+          {steps.length ? (
+            <StepList
+              steps={steps}
+              blocked={blocked || action !== null}
+              fallback={heading}
+              move={move}
+              edit={(step) => open({ kind: "edit", step })}
+              remove={(step) => open({ kind: "delete", step })}
+            />
+          ) : (
+            <p>Aucune étape.</p>
+          )}
+          {moving && <p role="status">Déplacement de l’étape…</p>}
+          {failed && (
+            <RequestError
+              message={`Impossible de déplacer l’étape ${failed.step.position} en position ${failed.position}.`}
+              retry={() => move(failed.step, failed.position)}
+            />
+          )}
+          <button
+            type="button"
+            aria-disabled={blocked || undefined}
+            aria-haspopup="dialog"
+            onClick={(e) => {
+              if (blocked) return;
+              e.currentTarget.focus();
+              open({ kind: "add" });
+            }}
+          >
+            Ajouter une étape
+          </button>
+        </>
       )}
-      {moving && <p role="status">Déplacement de l’étape…</p>}
-      {failed && (
+      <p className="step-read-status" role="status">
+        {pending &&
+          showReadStatus &&
+          (steps ? "Actualisation des étapes…" : "Chargement des étapes…")}
+      </p>
+      {readFailed && (
         <RequestError
-          message={`Impossible de déplacer l’étape ${failed.step.position} en position ${failed.position}.`}
-          retry={() => move(failed.step, failed.position)}
+          message={
+            steps
+              ? "Impossible d’actualiser les étapes."
+              : "Impossible de charger les étapes."
+          }
+          retry={() => {
+            heading.current?.focus({ preventScroll: true });
+            retry();
+          }}
         />
       )}
-      <button
-        type="button"
-        disabled={moving}
-        aria-haspopup="dialog"
-        onClick={(e) => {
-          e.currentTarget.focus();
-          open({ kind: "add" });
-        }}
-      >
-        Ajouter une étape
-      </button>
-      {action && (
+      {steps && action && (
         <StepDialog
           id={id}
           action={action}
-          count={state.data.length}
+          count={steps.length}
           close={() => setAction(null)}
           changed={changed}
           fallback={heading}

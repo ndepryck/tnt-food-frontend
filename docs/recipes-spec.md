@@ -54,6 +54,7 @@ Scope covers local development with React, TypeScript and Vite against the exist
 - **Ajouter une étape** requires an instruction and accepts an optional position. Omit the position when left blank so the API appends the step. The pencil edits the instruction or position.
 - Reorder steps by dragging a dedicated handle to the desired position with a mouse or touch. Show where the step will land. The position field in the edit dialog provides the same operation by keyboard or without dragging; separate up/down buttons are not needed. A cancelled drag or unchanged position sends no write. While a move is pending, prevent competing step mutations in this view. Refresh the list after success so the API determines the final numbering.
 - The trash icon confirms deletion of the chosen step. Use the positions returned after refreshing to reflect compaction.
+- Reserve modest space on the initial read and announce loading only if a read takes about 200 ms. Show results or errors immediately. After a successful write, keep the last list (or empty state) in place while refreshing; step controls stay locked until canonical positions load. If the refresh fails, leave the list readable and let **Réessayer** repeat only the GET, not the write.
 
 **Acceptance.** Append an instruction, insert one at the start, drag it to a later position, edit its text, then delete it. Verify that the position field can also reorder a step without dragging. After each operation and a reload, the displayed order matches the API.
 

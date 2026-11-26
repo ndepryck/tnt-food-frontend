@@ -18,6 +18,7 @@ export function useRead<T>(
     () => ({ load, attempt, validation, discardOn }),
     [load, attempt, validation, discardOn],
   );
+  const [settled, setSettled] = useState<typeof request | null>(null);
   const previous = useRef(load);
   useEffect(() => {
     const { load: read, discardOn: mustDiscard } = request;
@@ -32,25 +33,30 @@ export function useRead<T>(
     );
     read(controller.signal).then(
       (data) => {
-        if (!controller.signal.aborted) setState({ status: "ready", data });
+        if (controller.signal.aborted) return;
+        setState({ status: "ready", data });
+        setSettled(request);
       },
       (error) => {
-        if (!controller.signal.aborted)
-          setState((old) =>
-            old.status === "ready" && !mustDiscard?.(error)
-              ? { ...old, refreshFailed: true }
-              : { status: "error", error },
-          );
+        if (controller.signal.aborted) return;
+        setState((old) =>
+          old.status === "ready" && !mustDiscard?.(error)
+            ? { ...old, refreshFailed: true }
+            : { status: "error", error },
+        );
+        setSettled(request);
       },
     );
     return () => controller.abort();
   }, [request]);
   return {
     state,
+    pending: settled !== request,
     retry: () => setAttempt((value) => value + 1),
     replace(data: T) {
       active.current?.abort();
       setState({ status: "ready", data });
+      setSettled(request);
     },
   };
 }
