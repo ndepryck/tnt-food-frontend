@@ -1,5 +1,5 @@
-import type { Ingredient } from "./api/ingredients";
-import type { RecipeSearch } from "./api/recipes";
+import type { Ingredient } from "../../api/ingredients";
+import type { RecipeSearch } from "../../api/recipes";
 
 type RecipeFilter = NonNullable<RecipeSearch["filter"]>;
 

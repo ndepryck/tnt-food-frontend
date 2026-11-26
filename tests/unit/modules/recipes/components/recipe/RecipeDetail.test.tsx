@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
-import { RecipeDetail } from "../../../../src/modules/recipes/RecipeDetail";
+import { RecipeDetail } from "../../../../../../src/modules/recipes/components/recipe/RecipeDetail";
 
 const recipe = { id: "soupe", name: "Soupe", description: "Aux légumes." };
 const row = (name: string, quantity: string) => ({

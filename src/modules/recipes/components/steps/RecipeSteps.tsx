@@ -5,14 +5,14 @@ import {
   useRef,
   useState,
 } from "react";
-import { RequestError } from "../../core/RequestError";
-import { useRead } from "../../core/useRead";
+import { RequestError } from "../../../../core/RequestError";
+import { useRead } from "../../../../core/useRead";
 import {
   readSteps,
   type RecipeStepResponse as Step,
   updateRecipeStep,
-} from "./api/recipeSteps";
-import { recipeVisits } from "./recipeHistory";
+} from "../../api/recipeSteps";
+import { recipeVisits } from "../../navigation/recipeHistory";
 import { type StepAction, StepDialog } from "./StepDialog";
 import { StepList } from "./StepList";
 

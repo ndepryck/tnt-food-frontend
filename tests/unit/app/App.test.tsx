@@ -5,7 +5,7 @@ import { App } from "../../../src/app/App";
 import {
   recipeHistory,
   recipeVisits,
-} from "../../../src/modules/recipes/recipeHistory";
+} from "../../../src/modules/recipes/navigation/recipeHistory";
 
 const recipe = {
   id: "2beee154-db0a-4d14-93db-e2bb3ae94b18",

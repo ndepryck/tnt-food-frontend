@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { IconButton } from "../../core/IconButton";
-import type { RecipeStepResponse as Step } from "./api/recipeSteps";
+import { IconButton } from "../../../../core/IconButton";
+import type { RecipeStepResponse as Step } from "../../api/recipeSteps";
 
 type Drag = { pointerId: number; step: Step; destination?: number };
 type Point = { clientX: number; clientY: number };

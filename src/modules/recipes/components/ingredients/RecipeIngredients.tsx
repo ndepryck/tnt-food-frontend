@@ -1,8 +1,9 @@
 import { useCallback, useRef, useState } from "react";
-import { IconButton } from "../../core/IconButton";
-import { usePagedSearch } from "../../core/search/usePagedSearch";
-import { WriteDialog } from "../../core/WriteDialog";
-import type { Ingredient } from "./api/ingredients";
+import { IconButton } from "../../../../core/IconButton";
+import { PageAction } from "../../../../core/search/PageAction";
+import { usePagedSearch } from "../../../../core/search/usePagedSearch";
+import { WriteDialog } from "../../../../core/WriteDialog";
+import type { Ingredient } from "../../api/ingredients";
 import {
   addRecipeIngredient,
   type RecipeIngredientResponse,
@@ -10,10 +11,9 @@ import {
   readRecipeIngredients,
   removeRecipeIngredient,
   updateRecipeIngredient,
-} from "./api/recipeIngredients";
+} from "../../api/recipeIngredients";
+import { recipeVisits } from "../../navigation/recipeHistory";
 import { IngredientPicker } from "./IngredientPicker";
-import { PageAction } from "./PageAction";
-import { recipeVisits } from "./recipeHistory";
 
 type Action =
   | { kind: "add"; ingredient: Ingredient }

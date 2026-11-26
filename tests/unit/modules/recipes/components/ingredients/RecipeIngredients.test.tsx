@@ -1,7 +1,7 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, expect, test, vi } from "vitest";
-import { RecipeIngredients } from "../../../../src/modules/recipes/RecipeIngredients";
+import { RecipeIngredients } from "../../../../../../src/modules/recipes/components/ingredients/RecipeIngredients";
 
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function () {

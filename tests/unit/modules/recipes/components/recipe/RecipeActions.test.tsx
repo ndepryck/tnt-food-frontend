@@ -6,19 +6,22 @@ import {
   deleteRecipe,
   searchRecipes,
   updateRecipe,
-} from "../../../../src/modules/recipes/api/recipes";
-import { Catalogue } from "../../../../src/modules/recipes/Catalogue";
-import { recipeVisits } from "../../../../src/modules/recipes/recipeHistory";
+} from "../../../../../../src/modules/recipes/api/recipes";
+import { Catalogue } from "../../../../../../src/modules/recipes/components/catalogue/Catalogue";
+import { recipeVisits } from "../../../../../../src/modules/recipes/navigation/recipeHistory";
 
-vi.mock("../../../../src/modules/recipes/api/recipes", async (original) => ({
-  ...(await original<
-    typeof import("../../../../src/modules/recipes/api/recipes")
-  >()),
-  searchRecipes: vi.fn(),
-  updateRecipe: vi.fn(),
-  deleteRecipe: vi.fn(),
-  createRecipe: vi.fn(),
-}));
+vi.mock(
+  "../../../../../../src/modules/recipes/api/recipes",
+  async (original) => ({
+    ...(await original<
+      typeof import("../../../../../../src/modules/recipes/api/recipes")
+    >()),
+    searchRecipes: vi.fn(),
+    updateRecipe: vi.fn(),
+    deleteRecipe: vi.fn(),
+    createRecipe: vi.fn(),
+  }),
+);
 const recipe = { id: "1", name: "Soupe", description: "Aux carottes" };
 const page = {
   items: [recipe],

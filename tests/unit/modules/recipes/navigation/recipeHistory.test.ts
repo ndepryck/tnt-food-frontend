@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { recipeHistory } from "../../../../src/modules/recipes/recipeHistory";
+import { recipeHistory } from "../../../../../src/modules/recipes/navigation/recipeHistory";
 
 afterEach(() => {
   vi.restoreAllMocks();

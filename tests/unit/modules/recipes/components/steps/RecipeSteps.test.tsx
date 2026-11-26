@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, expect, test, vi } from "vitest";
-import { RecipeSteps } from "../../../../src/modules/recipes/RecipeSteps";
+import { RecipeSteps } from "../../../../../../src/modules/recipes/components/steps/RecipeSteps";
 
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function () {

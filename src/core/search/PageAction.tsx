@@ -34,7 +34,7 @@ export function PageAction({ results, query, list, fallback, label }: Props) {
       const appended = row?.hasAttribute("tabindex")
         ? row
         : row?.querySelector<HTMLElement>("a, button");
-      // A page of entirely excluded ingredients can have no focusable results.
+      // A page of entirely excluded results can have no focusable rows.
       if (appended) appended.focus();
       else if (!results.action) fallback.current?.focus();
     }

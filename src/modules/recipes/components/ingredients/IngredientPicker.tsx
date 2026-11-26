@@ -1,14 +1,14 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { dialogKeyboard } from "../../core/dialogKeyboard";
-import { RequestError } from "../../core/RequestError";
-import { usePagedSearch } from "../../core/search/usePagedSearch";
-import { useRead } from "../../core/useRead";
+import { dialogKeyboard } from "../../../../core/dialogKeyboard";
+import { RequestError } from "../../../../core/RequestError";
+import { PageAction } from "../../../../core/search/PageAction";
+import { usePagedSearch } from "../../../../core/search/usePagedSearch";
+import { useRead } from "../../../../core/useRead";
 import {
   type Ingredient,
   type IngredientSearch,
   searchIngredients,
-} from "./api/ingredients";
-import { PageAction } from "./PageAction";
+} from "../../api/ingredients";
 
 interface PickerProps {
   excluded: Ingredient[];

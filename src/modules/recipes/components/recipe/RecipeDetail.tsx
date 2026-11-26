@@ -1,17 +1,20 @@
 import { useCallback, useRef, useState } from "react";
-import placeholder from "../../assets/recipe-placeholder.png";
-import { HttpError } from "../../core/http";
-import { RequestError } from "../../core/RequestError";
-import { useRead } from "../../core/useRead";
-import { readRecipe } from "./api/recipes";
+import placeholder from "../../../../assets/recipe-placeholder.png";
+import { HttpError } from "../../../../core/http";
+import { RequestError } from "../../../../core/RequestError";
+import { useRead } from "../../../../core/useRead";
+import { readRecipe } from "../../api/recipes";
+import {
+  navigateAfterWrite,
+  useWriteArrivalFocus,
+} from "../../navigation/writeNavigation";
+import { RecipeIngredients } from "../ingredients/RecipeIngredients";
+import { RecipeSteps } from "../steps/RecipeSteps";
 import {
   type RecipeAction,
   RecipeButtons,
   RecipeDialog,
 } from "./RecipeActions";
-import { RecipeIngredients } from "./RecipeIngredients";
-import { RecipeSteps } from "./RecipeSteps";
-import { navigateAfterWrite, useWriteArrivalFocus } from "./writeNavigation";
 import "./detail.css";
 
 const isMissing = (error: unknown) =>

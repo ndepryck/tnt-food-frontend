@@ -1,11 +1,11 @@
 import { type RefObject, useState } from "react";
-import { WriteDialog } from "../../core/WriteDialog";
+import { WriteDialog } from "../../../../core/WriteDialog";
 import {
   createRecipeStep,
   deleteRecipeStep,
   type RecipeStepResponse as Step,
   updateRecipeStep,
-} from "./api/recipeSteps";
+} from "../../api/recipeSteps";
 
 export type StepAction =
   | { kind: "add" }

@@ -6,9 +6,17 @@ import {
   useRef,
   useState,
 } from "react";
-import placeholder from "../../assets/recipe-placeholder.png";
-import { usePagedSearch } from "../../core/search/usePagedSearch";
-import { type Recipe, searchRecipes } from "./api/recipes";
+import placeholder from "../../../../assets/recipe-placeholder.png";
+import { PageAction } from "../../../../core/search/PageAction";
+import { usePagedSearch } from "../../../../core/search/usePagedSearch";
+import { type Recipe, searchRecipes } from "../../api/recipes";
+import { useWriteArrivalFocus } from "../../navigation/writeNavigation";
+import { IngredientPicker } from "../ingredients/IngredientPicker";
+import {
+  type RecipeAction,
+  RecipeButtons,
+  RecipeDialog,
+} from "../recipe/RecipeActions";
 import {
   type Controls,
   catalogueQuery,
@@ -16,14 +24,6 @@ import {
   restore,
   sorts,
 } from "./catalogueQuery";
-import { IngredientPicker } from "./IngredientPicker";
-import { PageAction } from "./PageAction";
-import {
-  type RecipeAction,
-  RecipeButtons,
-  RecipeDialog,
-} from "./RecipeActions";
-import { useWriteArrivalFocus } from "./writeNavigation";
 import "./catalogue.css";
 
 function RemoveButton({

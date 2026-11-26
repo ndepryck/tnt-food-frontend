@@ -1,15 +1,15 @@
 import { type RefObject, useState } from "react";
-import { IconButton } from "../../core/IconButton";
-import { WriteDialog } from "../../core/WriteDialog";
+import { IconButton } from "../../../../core/IconButton";
+import { WriteDialog } from "../../../../core/WriteDialog";
 import {
   createRecipe,
   deleteRecipe,
   type Recipe,
   type UpdateRecipeRequest,
   updateRecipe,
-} from "./api/recipes";
-import { recipeVisits } from "./recipeHistory";
-import { navigateAfterWrite } from "./writeNavigation";
+} from "../../api/recipes";
+import { recipeVisits } from "../../navigation/recipeHistory";
+import { navigateAfterWrite } from "../../navigation/writeNavigation";
 
 export type RecipeAction =
   | { kind: "create" }

@@ -1,8 +1,8 @@
 import { useLayoutEffect, useState } from "react";
 import { MissingPage } from "../core/MissingPage";
-import { Catalogue } from "../modules/recipes/Catalogue";
-import { RecipeDetail } from "../modules/recipes/RecipeDetail";
-import { recipeVisits } from "../modules/recipes/recipeHistory";
+import { Catalogue } from "../modules/recipes/components/catalogue/Catalogue";
+import { RecipeDetail } from "../modules/recipes/components/recipe/RecipeDetail";
+import { recipeVisits } from "../modules/recipes/navigation/recipeHistory";
 
 export function App() {
   const [visit, setVisit] = useState(0);

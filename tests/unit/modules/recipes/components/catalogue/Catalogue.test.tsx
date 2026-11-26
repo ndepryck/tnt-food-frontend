@@ -8,18 +8,18 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, expect, it, vi } from "vitest";
-import type { Page } from "../../../../src/core/search/contract";
-import { searchIngredients } from "../../../../src/modules/recipes/api/ingredients";
+import type { Page } from "../../../../../../src/core/search/contract";
+import { searchIngredients } from "../../../../../../src/modules/recipes/api/ingredients";
 import {
   type Recipe,
   searchRecipes,
-} from "../../../../src/modules/recipes/api/recipes";
-import { Catalogue } from "../../../../src/modules/recipes/Catalogue";
+} from "../../../../../../src/modules/recipes/api/recipes";
+import { Catalogue } from "../../../../../../src/modules/recipes/components/catalogue/Catalogue";
 
-vi.mock("../../../../src/modules/recipes/api/recipes", () => ({
+vi.mock("../../../../../../src/modules/recipes/api/recipes", () => ({
   searchRecipes: vi.fn(),
 }));
-vi.mock("../../../../src/modules/recipes/api/ingredients", () => ({
+vi.mock("../../../../../../src/modules/recipes/api/ingredients", () => ({
   searchIngredients: vi.fn(),
 }));
 const recipes = vi.mocked(searchRecipes);
