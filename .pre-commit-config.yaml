@@ -1,0 +1,16 @@
+minimum_pre_commit_version: "3.2.0"
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        stages: [pre-commit]
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: Biome check (staged frontend files)
+        entry: node scripts/check-staged-biome.mjs
+        language: system
+        files: ^(src|tests)/
+        require_serial: true
+        stages: [pre-commit]
