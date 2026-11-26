@@ -75,7 +75,7 @@ Use the current neighboring backend implementation as the source of truth for re
 - Reuse one confirmation pattern and one save pattern. Trap focus within a dialog, allow Escape when no write is in progress, and restore focus on close or move it to a logical control if the invoker was removed. Prevent double submission. Keep input on failure and show useful feedback in French.
 - Follow the [design guide](design/recipes/README.md) for color, responsive behavior, icon names and focus. Icon tooltips supplement accessible names.
 - After each block, run `npm run typecheck` and `npm run build`. Exercise the block in the browser against the local API, with keyboard and narrow viewport checks for changed screens. Use a disposable recipe for destructive checks.
-- In OpenCode, ask `frontend-orchestrator` to implement one named block. Include prerequisites if earlier blocks are missing. Have the implementation, review, QA and walkthrough refer to that block's acceptance criteria.
+- In OpenCode, ask `frontend-orchestrator` to implement one named block. Include prerequisites if earlier blocks are missing. Use that block's acceptance criteria for implementation, review, QA and any explicitly requested walkthrough.
 
 ## Automated tests required for each block
 

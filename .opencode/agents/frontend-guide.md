@@ -1,5 +1,5 @@
 ---
-description: Writes an English walkthrough of each change for a backend developer.
+description: Writes an English walkthrough for a backend developer on explicit request.
 mode: subagent
 ---
 

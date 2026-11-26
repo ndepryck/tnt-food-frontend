@@ -45,7 +45,7 @@ Run `npm run check` to verify all source and test files, not just the staged fil
 
 Start an OpenCode session in this directory and describe the desired behavior to `frontend-orchestrator`. For example: “Add a keyboard-accessible link that takes me back to the top of the home page.”
 
-The orchestrator delegates implementation to `frontend-implementer`. Then `frontend-reviewer` reads the change while `frontend-qa` checks the user flows. After any fixes, `frontend-guide` writes an English walkthrough in `docs/reviews/`. The [agent definitions](.opencode/agents/) describe each role.
+The orchestrator delegates implementation to `frontend-implementer`. Then `frontend-reviewer` reads the change while `frontend-qa` checks the user flows. Review and QA do not require a walkthrough. If you explicitly request one, `frontend-guide` writes it in English in `docs/reviews/`. The [agent definitions](.opencode/agents/) describe each role.
 
 Implementation walkthroughs:
 
