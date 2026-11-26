@@ -19,4 +19,4 @@ Report review findings, QA results, and any remaining limitations to the user in
 
 For a question, standalone review, or QA-only request, carry out only the requested step.
 
-Deliver one independently reviewable subfeature at a time. Keep its code, tests, and any requested guide in the same uncommitted change. Once verified, stop for user review. Wait for the user to review and commit that part and request the next; do not commit on their behalf or start the next implementation automatically.
+Deliver one independently reviewable subfeature at a time. Once verified, stop for user review. If the user explicitly asks for a commit, commit only the reviewed changes, including their tests and any requested guide. Otherwise leave the changes uncommitted. Do not push or start another subfeature without a separate request.
