@@ -3,10 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { Catalogue } from "../../../../src/modules/recipes/Catalogue";
 import { recipeVisits } from "../../../../src/modules/recipes/recipeHistory";
-import { createRecipe, deleteRecipe, searchRecipes, updateRecipe } from "../../../../src/modules/recipes/api";
+import { createRecipe, deleteRecipe, searchRecipes, updateRecipe } from "../../../../src/modules/recipes/api/recipes";
 
-vi.mock("../../../../src/modules/recipes/api", async original => ({
-  ...await original<typeof import("../../../../src/modules/recipes/api")>(), searchRecipes: vi.fn(), updateRecipe: vi.fn(),
+vi.mock("../../../../src/modules/recipes/api/recipes", async original => ({
+  ...await original<typeof import("../../../../src/modules/recipes/api/recipes")>(), searchRecipes: vi.fn(), updateRecipe: vi.fn(),
   deleteRecipe: vi.fn(), createRecipe: vi.fn(),
 }));
 const recipe = { id: "1", name: "Soupe", description: "Aux carottes" };

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { searchRecipes, type Recipe } from "./api";
+import { searchRecipes, type Recipe } from "./api/recipes";
 import { RecipeButtons, RecipeDialog, type RecipeAction } from "./RecipeActions";
 import { useWriteArrivalFocus } from "./writeNavigation";
 import { catalogueQuery, remember, restore, sorts, type Controls } from "./catalogueQuery";

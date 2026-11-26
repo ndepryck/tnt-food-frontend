@@ -1,3 +1,7 @@
+export function jsonWrite(method: "POST" | "PATCH", body: unknown): RequestInit {
+  return { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+}
+
 export class HttpError extends Error {
   constructor(readonly status: number) {
     super(`HTTP ${status}`);

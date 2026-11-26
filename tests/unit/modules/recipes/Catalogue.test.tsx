@@ -2,10 +2,12 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, expect, it, vi } from "vitest";
 import { Catalogue } from "../../../../src/modules/recipes/Catalogue";
-import { searchIngredients, searchRecipes, type Recipe } from "../../../../src/modules/recipes/api";
+import { searchIngredients } from "../../../../src/modules/recipes/api/ingredients";
+import { searchRecipes, type Recipe } from "../../../../src/modules/recipes/api/recipes";
 import type { Page } from "../../../../src/core/search/contract";
 
-vi.mock("../../../../src/modules/recipes/api", () => ({ searchRecipes: vi.fn(), searchIngredients: vi.fn() }));
+vi.mock("../../../../src/modules/recipes/api/recipes", () => ({ searchRecipes: vi.fn() }));
+vi.mock("../../../../src/modules/recipes/api/ingredients", () => ({ searchIngredients: vi.fn() }));
 const recipes = vi.mocked(searchRecipes);
 const ingredients = vi.mocked(searchIngredients);
 const page = (names: string[], nextOffset: number | null = null): Page<Recipe> => ({

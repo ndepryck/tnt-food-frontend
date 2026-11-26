@@ -2,8 +2,9 @@ import { useCallback, useRef, useState } from "react";
 import { IconButton } from "../../core/IconButton";
 import { WriteDialog } from "../../core/WriteDialog";
 import { usePagedSearch } from "../../core/search/usePagedSearch";
+import type { Ingredient } from "./api/ingredients";
 import { addRecipeIngredient, readLinkedIngredients, readRecipeIngredients, removeRecipeIngredient, updateRecipeIngredient,
-  type Ingredient, type RecipeIngredientResponse } from "./api";
+  type RecipeIngredientResponse } from "./api/recipeIngredients";
 import { IngredientPicker } from "./IngredientPicker";
 import { PageAction } from "./PageAction";
 import { recipeVisits } from "./recipeHistory";

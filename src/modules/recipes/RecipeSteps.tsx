@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { RequestError } from "../../core/RequestError";
 import { useRead } from "../../core/useRead";
-import { readSteps, updateRecipeStep, type RecipeStepResponse as Step } from "./api";
+import { readSteps, updateRecipeStep, type RecipeStepResponse as Step } from "./api/recipeSteps";
 import { recipeVisits } from "./recipeHistory";
 import { StepDialog, type StepAction } from "./StepDialog";
 import { StepList } from "./StepList";

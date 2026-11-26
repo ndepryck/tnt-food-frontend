@@ -1,6 +1,6 @@
 import { useState, type RefObject } from "react";
 import { WriteDialog } from "../../core/WriteDialog";
-import { createRecipeStep, deleteRecipeStep, updateRecipeStep, type RecipeStepResponse as Step } from "./api";
+import { createRecipeStep, deleteRecipeStep, updateRecipeStep, type RecipeStepResponse as Step } from "./api/recipeSteps";
 
 export type StepAction = { kind: "add" } | { kind: "edit" | "delete"; step: Step };
 

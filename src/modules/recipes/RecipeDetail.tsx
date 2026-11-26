@@ -5,7 +5,7 @@ import placeholder from "../../assets/recipe-placeholder.png";
 import { RequestError } from "../../core/RequestError";
 import { HttpError } from "../../core/http";
 import { useRead } from "../../core/useRead";
-import { readRecipe } from "./api";
+import { readRecipe } from "./api/recipes";
 import { RecipeSteps } from "./RecipeSteps";
 import { RecipeIngredients } from "./RecipeIngredients";
 import "./detail.css";

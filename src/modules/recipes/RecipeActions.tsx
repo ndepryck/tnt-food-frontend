@@ -1,5 +1,5 @@
 import { useState, type RefObject } from "react";
-import { createRecipe, deleteRecipe, updateRecipe, type Recipe, type UpdateRecipeRequest } from "./api";
+import { createRecipe, deleteRecipe, updateRecipe, type Recipe, type UpdateRecipeRequest } from "./api/recipes";
 import { IconButton } from "../../core/IconButton";
 import { WriteDialog } from "../../core/WriteDialog";
 import { navigateAfterWrite } from "./writeNavigation";

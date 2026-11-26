@@ -1,5 +1,5 @@
 import { useLayoutEffect, useId, useMemo, useRef, useState } from "react";
-import { searchIngredients, type Ingredient, type IngredientSearch } from "./api";
+import { searchIngredients, type Ingredient, type IngredientSearch } from "./api/ingredients";
 import { usePagedSearch } from "../../core/search/usePagedSearch";
 import { PageAction } from "./PageAction";
 import { useRead } from "../../core/useRead";
