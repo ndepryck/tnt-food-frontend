@@ -28,7 +28,22 @@ export function App() {
       <header>
         <nav aria-label="Navigation principale">
           <strong>TNT Food</strong>
-          <a href="/recipes" aria-current={catalogue ? "page" : undefined}>
+          <a
+            href="/recipes"
+            aria-current={catalogue ? "page" : undefined}
+            onClick={(event) => {
+              if (
+                catalogue &&
+                event.button === 0 &&
+                !event.altKey &&
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.shiftKey
+              ) {
+                event.preventDefault();
+              }
+            }}
+          >
             Recettes
           </a>
         </nav>

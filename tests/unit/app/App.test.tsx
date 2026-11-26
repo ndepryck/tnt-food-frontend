@@ -1,4 +1,11 @@
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "../../../src/app/App";
@@ -45,6 +52,90 @@ test("Given the catalogue request is pending, When I open the root, Then I see l
     ),
   ).toBe(`/recipes/${recipe.id}`);
 });
+
+function headerRecipesLink() {
+  return within(
+    screen.getByRole("navigation", { name: "Navigation principale" }),
+  ).getByRole("link", { name: "Recettes" });
+}
+
+test.each(["/", "/recipes", "/recipes/"])(
+  "Given the catalogue at %s, When I repeatedly click its header link and press Enter, Then default navigation is canceled and focus and results stay put",
+  async (path) => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({ items: [recipe] }));
+    vi.stubGlobal("fetch", fetch);
+    history.replaceState(null, "", path);
+    render(<App />);
+    const result = await screen.findByRole("link", { name: recipe.name });
+    const link = headerRecipesLink();
+    expect(link.getAttribute("href")).toBe("/recipes");
+    expect(link.getAttribute("aria-current")).toBe("page");
+
+    const canceled: boolean[] = [];
+    const observe = (event: MouseEvent) => {
+      canceled.push(event.defaultPrevented);
+      event.preventDefault(); // Do not let an uncanceled event navigate in jsdom.
+    };
+    document.addEventListener("click", observe);
+    try {
+      const user = userEvent.setup();
+      await user.click(link);
+      await user.click(link);
+      await user.keyboard("{Enter}");
+    } finally {
+      document.removeEventListener("click", observe);
+    }
+
+    expect(canceled).toEqual([true, true, true]);
+    expect(document.activeElement).toBe(link);
+    expect(screen.getByRole("link", { name: recipe.name })).toBe(result);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  },
+);
+
+test.each([
+  ["/recipes", "Control-click", "click", { ctrlKey: true }],
+  ["/recipes", "Command-click", "click", { metaKey: true }],
+  ["/recipes", "Shift-click", "click", { shiftKey: true }],
+  ["/recipes", "Alt-click", "click", { altKey: true }],
+  ["/recipes", "middle-click", "auxclick", { button: 1 }],
+  [`/recipes/${recipe.id}`, "click", "click", {}],
+  ["/missing-page", "click", "click", {}],
+])(
+  "Given the page at %s, When I %s the header link, Then the native default action is not canceled",
+  async (path, _gesture, type, options) => {
+    vi.stubGlobal("fetch", async (url: string) => {
+      if (url.endsWith("/steps")) return Response.json([]);
+      if (url.includes("/ingredients?") || url.endsWith("/search"))
+        return Response.json({ items: [], hasMore: false });
+      return Response.json(recipe);
+    });
+    history.replaceState(null, "", path);
+    render(<App />);
+    if (path === "/recipes") await screen.findByText("Aucune recette.");
+    if (path.endsWith(recipe.id)) {
+      await screen.findByRole("heading", { name: recipe.name });
+    }
+    const link = headerRecipesLink();
+    expect(link.getAttribute("href")).toBe("/recipes");
+    expect(link.getAttribute("aria-current")).toBe(
+      path === "/recipes" ? "page" : null,
+    );
+    let canceled: boolean | undefined;
+    document.addEventListener(
+      type,
+      (event) => {
+        canceled = event.defaultPrevented;
+        event.preventDefault(); // Observe React's decision without asking jsdom to navigate.
+      },
+      { once: true },
+    );
+    link.dispatchEvent(
+      new MouseEvent(type, { bubbles: true, cancelable: true, ...options }),
+    );
+    expect(canceled).toBe(false);
+  },
+);
 
 test("Given the catalogue is offline, When I retry after recovery, Then I see the empty catalogue", async () => {
   vi.stubGlobal(

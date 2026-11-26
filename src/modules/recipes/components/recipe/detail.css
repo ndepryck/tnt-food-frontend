@@ -1,10 +1,7 @@
-main:has(> .recipe-detail),
-body:has(.recipe-detail) header nav {
+main:has(> .recipe-detail) {
   max-width: 96rem;
   box-sizing: border-box;
   padding-inline: clamp(1rem, 4.55vw, 4.375rem);
-}
-main:has(> .recipe-detail) {
   padding-top: clamp(1rem, 2.5vw, 2.5rem);
 }
 .recipe-detail {
