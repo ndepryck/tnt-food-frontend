@@ -1,0 +1,19 @@
+:root {
+  --cream: #F6F1E8;
+  --olive: #46523D;
+  --terracotta: #B84C24;
+  background: var(--cream);
+  color: var(--olive);
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+body { margin: 0; overflow-wrap: anywhere; }
+header { border-bottom: 1px solid var(--olive); }
+nav, main { max-width: 64rem; margin: auto; padding: 1rem clamp(1rem, 5vw, 4rem); }
+nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+nav strong, h1 { font-family: Georgia, serif; }
+nav strong { font-size: 1.5rem; }
+a { color: inherit; display: inline-block; padding-block: .65rem; }
+ul { padding-inline-start: 1.5rem; }
+button { font: inherit; padding: .65rem 1rem; background: var(--terracotta); color: white; border: 0; border-radius: .3rem; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 3px; }

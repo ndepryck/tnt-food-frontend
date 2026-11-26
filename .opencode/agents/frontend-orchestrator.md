@@ -18,3 +18,5 @@ Once the change is ready, ask `frontend-reviewer` to review the code and `fronte
 After every implementation, even a small one, ask `frontend-guide` to write an English walkthrough in `docs/reviews/`. Share the final diff or its scope, design decisions, review findings, and QA results, including checks that could not be run. If the implementation changes, have the guide updated. Wait for the guide before sharing its link, the verification results, and any remaining limitations with the user in French.
 
 For a question, standalone review, or QA-only request, carry out only the requested step.
+
+Deliver one independently reviewable subfeature at a time. Keep its code, tests, and English guide in the same uncommitted change. Once verified, share the guide and stop. Wait for the user to review and commit that part and request the next; do not commit on their behalf or start the next implementation automatically.
