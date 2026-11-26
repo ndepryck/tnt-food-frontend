@@ -15,7 +15,12 @@ Start an OpenCode session in this directory and describe the desired behavior to
 
 The orchestrator delegates implementation to `frontend-implementer`. Then `frontend-reviewer` reads the change while `frontend-qa` checks the user flows. After any fixes, `frontend-guide` writes an English walkthrough in `docs/reviews/`. The [agent definitions](.opencode/agents/) describe each role.
 
-Current walkthrough: [Part 1 — navigation and API reads](docs/reviews/01-navigation-and-api.md). Read it before committing this slice. For local services and test commands, see [Testing](docs/testing.md).
+Implementation walkthroughs:
+
+1. [Navigation and API reads](docs/reviews/01-navigation-and-api.md)
+2. [Catalogue and live filters](docs/reviews/02-catalogue-and-filters.md)
+
+For local services and test commands, see [Testing](docs/testing.md).
 
 ## Recipe interface
 
