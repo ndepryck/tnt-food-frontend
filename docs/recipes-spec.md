@@ -52,10 +52,10 @@ Scope covers local development with React, TypeScript and Vite against the exist
 ## 6. Preparation steps
 
 - **Ajouter une étape** requires an instruction and accepts an optional position. Omit the position when left blank so the API appends the step. The pencil edits the instruction or position.
-- Up and down arrows move to the adjacent step's position. Show only moves that are possible. While a move is pending, prevent competing step mutations in this view. Refresh the list after a success so the API determines the final numbering.
+- Reorder steps by dragging a dedicated handle to the desired position with a mouse or touch. Show where the step will land. The position field in the edit dialog provides the same operation by keyboard or without dragging; separate up/down buttons are not needed. A cancelled drag or unchanged position sends no write. While a move is pending, prevent competing step mutations in this view. Refresh the list after success so the API determines the final numbering.
 - The trash icon confirms deletion of the chosen step. Use the positions returned after refreshing to reflect compaction.
 
-**Acceptance.** Append an instruction, insert one at the start, move it down, edit its text, then delete it. After each operation and a reload, the displayed order matches the API.
+**Acceptance.** Append an instruction, insert one at the start, drag it to a later position, edit its text, then delete it. Verify that the position field can also reorder a step without dragging. After each operation and a reload, the displayed order matches the API.
 
 ## API mapping
 

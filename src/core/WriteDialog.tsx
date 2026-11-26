@@ -47,6 +47,7 @@ export function WriteDialog({ title, submitLabel, failure, close, write, fields,
       blank.focus();
       return;
     }
+    if (!form.reportValidity()) return;
     lock.current = true;
     setBusy(true);
     setError("");

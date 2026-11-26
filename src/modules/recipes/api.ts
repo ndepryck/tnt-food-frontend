@@ -64,7 +64,19 @@ export async function removeRecipeIngredient(id: string, ingredientId: string) {
   await request(`${memberships(id)}/${encodeURIComponent(ingredientId)}`, { method: "DELETE" });
 }
 
+const stepsUrl = (id: string) => `${recipes}/${encodeURIComponent(id)}/steps`;
+type StepFields = Pick<RecipeStepResponse, "description"> & { position?: number };
+
+export function createRecipeStep(id: string, fields: StepFields) {
+  return requestJson<RecipeStepResponse>(stepsUrl(id), jsonWrite("POST", fields));
+}
+export function updateRecipeStep(id: string, stepId: string, fields: Partial<StepFields>) {
+  return requestJson<RecipeStepResponse>(`${stepsUrl(id)}/${encodeURIComponent(stepId)}`, jsonWrite("PATCH", fields));
+}
+export async function deleteRecipeStep(id: string, stepId: string) {
+  await request(`${stepsUrl(id)}/${encodeURIComponent(stepId)}`, { method: "DELETE" });
+}
 export async function readSteps(id: string, signal: AbortSignal) {
-  const steps = await requestJson<RecipeStepResponse[]>(`${recipes}/${encodeURIComponent(id)}/steps`, { signal });
+  const steps = await requestJson<RecipeStepResponse[]>(stepsUrl(id), { signal });
   return steps.sort((a, b) => a.position - b.position);
 }

@@ -5,27 +5,10 @@ import placeholder from "../../assets/recipe-placeholder.png";
 import { RequestError } from "../../core/RequestError";
 import { HttpError } from "../../core/http";
 import { useRead } from "../../core/useRead";
-import { readRecipe, readSteps } from "./api";
+import { readRecipe } from "./api";
+import { RecipeSteps } from "./RecipeSteps";
 import { RecipeIngredients } from "./RecipeIngredients";
 import "./detail.css";
-
-function Preparation({ id }: { id: string }) {
-  const heading = useRef<HTMLHeadingElement>(null);
-  const load = useCallback((signal: AbortSignal) => readSteps(id, signal), [id]);
-  const { state, retry } = useRead(load);
-  return <section aria-labelledby="step-heading">
-    <h2 id="step-heading" tabIndex={-1} ref={heading}>Préparation</h2>
-    {state.status === "loading" && <p role="status">Chargement des étapes…</p>}
-    {state.status === "error" && <RequestError message="Impossible de charger les étapes." retry={() => {
-      heading.current?.focus();
-      retry();
-    }} />}
-    {state.status === "ready" && (state.data.length ? <ol>{state.data.map(step =>
-      <li key={step.id} value={step.position}>
-        <span aria-hidden="true">{step.position}.</span>{step.description}
-      </li>)}</ol> : <p>Aucune étape.</p>)}
-  </section>;
-}
 
 const isMissing = (error: unknown) => error instanceof HttpError && error.status === 404;
 
@@ -60,6 +43,6 @@ export function RecipeDetail({ id, validation = 0 }: { id: string; validation?: 
       </div>
       {!missing && <div className="recipe-illustration"><img src={placeholder} alt="" /></div>}
     </div>
-    {!missing && <div className="recipe-sections"><RecipeIngredients id={id} validation={validation} /><Preparation id={id} /></div>}
+    {!missing && <div className="recipe-sections"><RecipeIngredients id={id} validation={validation} /><RecipeSteps key={validation} id={id} /></div>}
   </article>;
 }

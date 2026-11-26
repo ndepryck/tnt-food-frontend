@@ -22,6 +22,7 @@ Implementation walkthroughs:
 3. [Recipe detail: ingredients and preparation](docs/reviews/03-recipe-detail.md)
 4. [Create, edit, and delete a recipe](docs/reviews/04-recipe-writes.md)
 5. [Manage the ingredients in a recipe](docs/reviews/05-recipe-ingredients.md)
+6. [Edit and reorder preparation steps](docs/reviews/06-preparation-steps.md)
 
 For local services and test commands, see [Testing](docs/testing.md).
 

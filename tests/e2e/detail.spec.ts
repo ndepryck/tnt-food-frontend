@@ -25,7 +25,7 @@ test("Given a disposable recipe, When I read it empty and reload it after seedin
     const ingredients = page.getByRole("region", { name: "Ingrédients" });
     const steps = page.getByRole("region", { name: "Préparation" });
     await expect(ingredients.getByRole("listitem").filter({ hasText: ingredient })).toContainText("1 c. à café");
-    await expect(steps.getByRole("listitem")).toHaveText(["1.Mélanger.", "2.Servir."]);
+    await expect(steps.locator(".step-instruction")).toHaveText(["1.Mélanger.", "2.Servir."]);
     for (const width of [375, 1536]) {
       await page.setViewportSize({ width, height: 800 });
       const left = (await ingredients.boundingBox())!;

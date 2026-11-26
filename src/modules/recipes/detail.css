@@ -26,8 +26,19 @@ main:has(> .recipe-detail) { padding-top: clamp(1rem, 2.5vw, 2.5rem); }
   .memberships > li { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
   .memberships .recipe-actions { grid-column: 1 / -1; justify-content: start; }
 }
-.recipe-detail ol li { grid-template-columns: auto minmax(0, 1fr); }
-.recipe-detail ol li span { font: bold 1.6rem Georgia, serif; color: var(--terracotta); }
+.recipe-detail .step-list li { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.step-instruction { display: flex; align-items: baseline; gap: .5rem; }
+.step-instruction b { font: bold 1.6rem Georgia, serif; color: var(--terracotta); }
+.step-handle { touch-action: none; user-select: none; cursor: grab; }
+.step-handle:active { cursor: grabbing; }
+.step-list .tooltip { pointer-events: none; }
+.step-list li[data-drop="before"] { box-shadow: inset 0 3px var(--terracotta); }
+.step-list li[data-drop="after"] { box-shadow: inset 0 -3px var(--terracotta); }
+@media (max-width: 32rem) {
+  .recipe-detail .step-list li { grid-template-columns: minmax(0, 1fr); }
+  .step-list .recipe-actions { justify-content: start; }
+  .step-list .tooltip { left: 0; right: auto; }
+}
 .recipe-detail button { font: 1rem/1.5 system-ui, sans-serif; }
 .recipe-sections > section > button { margin: .75rem .5rem .75rem 0; }
 @media (min-width: 48rem) {

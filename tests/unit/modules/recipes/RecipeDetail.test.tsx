@@ -19,7 +19,7 @@ test("Given steps arrive out of order, When I open the recipe, Then preparation 
   render(<RecipeDetail id={recipe.id} />);
   const preparation = within(screen.getByRole("region", { name: "Préparation" }));
   const rows = await preparation.findAllByRole("listitem");
-  expect(rows.map(row => row.textContent)).toEqual(["2.Mélanger.", "10.Servir."]);
+  expect(rows.map(row => row.querySelector(".step-instruction")?.textContent)).toEqual(["2.Mélanger.", "10.Servir."]);
 });
 
 test("Given the next ingredient page fails, When I retry it by keyboard, Then the same offset loads and focus reaches the appended row", async () => {
