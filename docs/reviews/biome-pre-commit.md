@@ -11,7 +11,7 @@ This diff is repo tooling only: no application code and no React components are 
 3. [biome.json](../../biome.json) — the rules: 2-space indent, 80-column lines, `recommended` lint preset. In Biome 2.x, `biome check` covers formatting, lint, and import organization (assist).
 4. [.pre-commit-config.yaml](../../.pre-commit-config.yaml) — Gitleaks scans staged changes across the repository for secrets. The separate local Biome hook runs `node scripts/check-staged-biome.mjs` on `src/` and `tests/`, including the frontend security rules in `biome.json`.
 5. [scripts/check-staged-biome.mjs](../../scripts/check-staged-biome.mjs) — the raw Git index runner (below).
-6. [README.md](../../README.md) — per-clone setup steps and the baseline note.
+6. [README.md](../../README.md) — per-clone setup steps and repo-wide check instructions.
 
 ## Who owns the data and how it flows
 
@@ -26,11 +26,11 @@ From `frontend/`: run `npm ci` (installs the pinned Biome together with React/Vi
 
 ## Fix-and-restage workflow
 
-When the hook fails: read the diagnostics, run `npm run format` — or, during the migration, format only the file you are changing with `./node_modules/.bin/biome format --write path/to/file.tsx` — fix any remaining lint diagnostics by hand, then `git add` the fixed file and commit again. The hook re-checks the **whole staged file**, not just your lines. `git commit --no-verify` bypasses the hook once but is not recommended.
+When the hook fails: read the diagnostics, run `npm run format` — or format only the file you are changing with `./node_modules/.bin/biome format --write path/to/file.tsx` — fix any remaining lint diagnostics by hand, then `git add` the fixed file and commit again. The hook re-checks the **whole staged file**, not just your lines. `git commit --no-verify` bypasses the hook once but is not recommended.
 
-## Repo-wide baseline (no mass reformat)
+## Repo-wide baseline
 
-Before Biome, the repo already had violations: the initial scan reports exactly 70 errors and 21 warnings (re-verified with `biome check src tests`: `Found 70 errors.` / `Found 21 warnings.`). This change does not reformat the repository and does not suppress those diagnostics, so repo-wide `npm run check` is expected to fail until the baseline is cleaned up file by file. Because the hook checks whole staged files, staging a file with pre-existing violations fails the hook even if your own edits are clean.
+When the hook was introduced, the initial scan found 70 errors and 21 warnings. Use `npm run check` for the current working-tree result. At commit time the hook instead checks each selected file in full, using its staged contents.
 
 ## Scenario and QA status (all checks completed)
 
@@ -49,4 +49,4 @@ Completed QA for this tooling slice:
 
 In a scratch clone: `npm ci`, `pre-commit install`, then create `src/tmp-biome-check.ts` with 4-space indentation, `git add` it and run `git commit -m test`. **Expected:** the hook fails with a format diff for that file and `git log` shows no new commit. Then run `npm run format`, `git add src/tmp-biome-check.ts`, and commit again: **expected** the hook passes and the commit is created. Remove the temp file afterward.
 
-**Limitations:** the `files: ^(src|tests)/` filter means `package.json`, `biome.json`, YAML and Markdown are never linted by the hook; the check is whole-file and check-only (no auto-fix), and the 70-error/21-warning baseline means touching an unclean file blocks you while repo-wide `npm run check` fails until cleanup; the runner reads `:0:biome.json`, so it assumes `biome.json` exists in the index (true for every commit once this diff is committed; it errors if the file is absent from the index); setup is per clone and requires `npm ci` first — without `node_modules/@biomejs/biome/bin/biome` the hook fails and blocks commits; pre-commit must be ≥ 3.2.0 (`minimum_pre_commit_version`); and pre-commit’s stash/restore round-trip can normalize your working-tree line endings on restore even though the check read raw index bytes.
+**Limitations:** the `files: ^(src|tests)/` filter means `package.json`, `biome.json`, YAML and Markdown are never linted by the hook; the check is whole-file and check-only (no auto-fix); the runner reads `:0:biome.json`, so it assumes `biome.json` exists in the index (true for every commit once this diff is committed; it errors if the file is absent from the index); setup is per clone and requires `npm ci` first — without `node_modules/@biomejs/biome/bin/biome` the hook fails and blocks commits; pre-commit must be ≥ 3.2.0 (`minimum_pre_commit_version`); and pre-commit’s stash/restore round-trip can normalize your working-tree line endings on restore even though the check read raw index bytes.

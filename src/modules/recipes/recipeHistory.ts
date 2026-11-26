@@ -1,5 +1,9 @@
 const key = "recipes:history:v1";
-type Ledger = { epoch: string; catalogue: number; details: Record<string, number> };
+type Ledger = {
+  epoch: string;
+  catalogue: number;
+  details: Record<string, number>;
+};
 type Entry = { getState(): Record<string, unknown> | undefined };
 type Navigation = {
   currentEntry: Entry;
@@ -8,7 +12,11 @@ type Navigation = {
 };
 function navigation() {
   const nav = (window as Window & { navigation?: Navigation }).navigation;
-  return nav?.currentEntry && "activation" in nav && typeof nav.updateCurrentEntry === "function" ? nav : undefined;
+  return nav?.currentEntry &&
+    "activation" in nav &&
+    typeof nav.updateCurrentEntry === "function"
+    ? nav
+    : undefined;
 }
 
 // Carry revisions on the actual departing history entry. Publish them while
@@ -17,18 +25,38 @@ function navigation() {
 function arrive(): Ledger {
   try {
     const nav = navigation();
-    const saved = nav ? nav.activation?.from?.getState()?.[key] : JSON.parse(sessionStorage.getItem(key) ?? "null");
-    if (typeof saved?.epoch === "string" && Number.isSafeInteger(saved.catalogue) && saved.details) return saved;
-  } catch { /* An unverifiable visit starts a new lineage. */ }
-  return { epoch: crypto.getRandomValues(new Uint32Array(4)).join("-"), catalogue: 0, details: {} };
+    const saved = nav
+      ? nav.activation?.from?.getState()?.[key]
+      : JSON.parse(sessionStorage.getItem(key) ?? "null");
+    if (
+      typeof saved?.epoch === "string" &&
+      Number.isSafeInteger(saved.catalogue) &&
+      saved.details
+    )
+      return saved;
+  } catch {
+    /* An unverifiable visit starts a new lineage. */
+  }
+  return {
+    epoch: crypto.getRandomValues(new Uint32Array(4)).join("-"),
+    catalogue: 0,
+    details: {},
+  };
 }
 function publish(ledger: Ledger) {
   try {
     const nav = navigation();
-    if (nav) nav.updateCurrentEntry({ state: { ...nav.currentEntry.getState(), [key]: ledger } });
+    if (nav)
+      nav.updateCurrentEntry({
+        state: { ...nav.currentEntry.getState(), [key]: ledger },
+      });
     else sessionStorage.setItem(key, JSON.stringify(ledger));
   } catch {
-    try { sessionStorage.removeItem(key); } catch { /* Storage disabled. */ }
+    try {
+      sessionStorage.removeItem(key);
+    } catch {
+      /* Storage disabled. */
+    }
   }
 }
 
@@ -41,19 +69,29 @@ export function recipeHistory() {
       ledger.details[id.toLowerCase()] = ++ledger.catalogue;
       publish(ledger);
     },
-    leavingAfterWrite() { leavingWrite = true; },
+    leavingAfterWrite() {
+      leavingWrite = true;
+    },
     restore(detailId?: string) {
       const next = arrive();
       const id = detailId?.toLowerCase();
       const comparable = ledger.epoch === next.epoch;
-      const changed = leavingWrite || (comparable &&
-        (id ? ledger.details[id] !== next.details[id] : ledger.catalogue !== next.catalogue));
+      const changed =
+        leavingWrite ||
+        (comparable &&
+          (id
+            ? ledger.details[id] !== next.details[id]
+            : ledger.catalogue !== next.catalogue));
       ledger = next;
       publish(ledger);
       leavingWrite = false;
       // An unchanged storage record cannot vouch for a different document
       // whose writes to that storage were denied.
-      return changed ? "changed" : comparable && navigation() ? "current" : "unknown";
+      return changed
+        ? "changed"
+        : comparable && navigation()
+          ? "current"
+          : "unknown";
     },
   };
 }

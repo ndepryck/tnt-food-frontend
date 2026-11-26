@@ -20,8 +20,7 @@ configured before installing.
 - `npm run check` checks formatting, recommended lint rules, and import
   organization in `src/` and `tests/` without changing files. Warnings fail the
   check too.
-- `npm run format` rewrites formatting only in those directories. During the
-  migration, format only the file you are changing to avoid unrelated edits:
+- `npm run format` rewrites formatting only in those directories. To keep reviews focused, format only the file you are changing to avoid unrelated edits:
   `./node_modules/.bin/biome format --write path/to/file.tsx`.
 - The pre-commit hook runs the locally installed, lockfile-pinned Biome on a
   temporary copy of staged files under `src/` and `tests/`, plus the staged
@@ -40,12 +39,7 @@ configured before installing.
   `javascript:` URLs in supported contexts. Prefer rendering untrusted strings
   as JSX text. These static checks do not audit dependency vulnerabilities.
 
-**Existing baseline:** Before Biome was introduced, the app and tests already
-had formatting, import organization, and lint violations. The initial scan
-reported 70 errors and 21 warnings. This change does not reformat the whole
-repository or suppress those diagnostics, so the full `npm run check` is
-expected to fail until the baseline is cleaned up. The hook checks whole
-staged files, not just changed lines.
+Run `npm run check` to verify all source and test files, not just the staged files. Both checks treat warnings as failures.
 
 ## Working with the agents
 

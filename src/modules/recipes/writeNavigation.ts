@@ -1,4 +1,4 @@
-import { useLayoutEffect, type RefObject } from "react";
+import { type RefObject, useLayoutEffect } from "react";
 import { recipeVisits } from "./recipeHistory";
 
 // A normal document navigation preserves history. Only move focus when the
@@ -6,7 +6,11 @@ import { recipeVisits } from "./recipeHistory";
 const key = "recipes:write-destination";
 export function navigateAfterWrite(path: string) {
   recipeVisits.leavingAfterWrite();
-  try { sessionStorage.setItem(key, path); } catch { /* Focus hint is optional. */ }
+  try {
+    sessionStorage.setItem(key, path);
+  } catch {
+    /* Focus hint is optional. */
+  }
   window.location.assign(path);
 }
 export function useWriteArrivalFocus(target: RefObject<HTMLElement | null>) {
@@ -15,6 +19,8 @@ export function useWriteArrivalFocus(target: RefObject<HTMLElement | null>) {
       if (sessionStorage.getItem(key) !== location.pathname) return;
       sessionStorage.removeItem(key);
       if (document.activeElement === document.body) target.current?.focus();
-    } catch { /* Storage may be unavailable. */ }
+    } catch {
+      /* Storage may be unavailable. */
+    }
   }, [target]);
 }
