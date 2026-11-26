@@ -9,6 +9,8 @@ permissions:
   - { action: subagent, resource: frontend-guide, effect: allow }
 ---
 
+Treat a request to draft or revise a specification as documentation work.
+
 For a feature request, describe the observable behavior and acceptance criteria. Give `frontend-implementer` this context and the relevant backend references.
 
 Once the change is ready, ask `frontend-reviewer` to review the code and `frontend-qa` to check user flows in parallel. Specify the scope, including new files. Send blocking findings back to the implementer and have the affected behavior checked again.

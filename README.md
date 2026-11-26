@@ -16,3 +16,10 @@ Start an OpenCode session in this directory and describe the desired behavior to
 The orchestrator delegates implementation to `frontend-implementer`. Then `frontend-reviewer` reads the change while `frontend-qa` checks the user flows. After any fixes, `frontend-guide` writes an English walkthrough in `docs/reviews/`. The [agent definitions](.opencode/agents/) describe each role.
 
 First walkthrough: [how the home page is rendered](docs/reviews/home-page.md).
+
+## Recipe interface
+
+[Feature specification](docs/recipes-spec.md) · [Mockups and design guide](docs/design/recipes/README.md)
+
+To work incrementally in OpenCode, ask `frontend-orchestrator` for a named
+block, such as “Implement block 1 of the recipe interface specification.”
