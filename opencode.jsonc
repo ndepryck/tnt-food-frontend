@@ -1,4 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "frontend-orchestrator"
+  "default_agent": "frontend-orchestrator",
+  "agents": {
+    "frontend-implementer": { "model": "openai/gpt-6.2-sol" },
+    "frontend-reviewer": { "model": "openai/gpt-6.2-sol" },
+    "frontend-qa": { "model": "openai/gpt-6.2-sol" },
+    "frontend-guide": { "model": "mistral/mistral-large-4" }
+  }
 }
