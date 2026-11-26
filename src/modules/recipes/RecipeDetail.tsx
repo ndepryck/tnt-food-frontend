@@ -4,28 +4,10 @@ import { navigateAfterWrite, useWriteArrivalFocus } from "./writeNavigation";
 import placeholder from "../../assets/recipe-placeholder.png";
 import { RequestError } from "../../core/RequestError";
 import { HttpError } from "../../core/http";
-import { usePagedSearch } from "../../core/search/usePagedSearch";
 import { useRead } from "../../core/useRead";
-import { readRecipeIngredients, readRecipe, readSteps } from "./api";
-import { PageAction } from "./PageAction";
+import { readRecipe, readSteps } from "./api";
+import { RecipeIngredients } from "./RecipeIngredients";
 import "./detail.css";
-
-function Ingredients({ id }: { id: string }) {
-  const results = usePagedSearch(readRecipeIngredients, id);
-  const heading = useRef<HTMLHeadingElement>(null);
-  const list = useRef<HTMLUListElement>(null);
-  return <section aria-labelledby="ingredient-heading">
-    <h2 id="ingredient-heading" tabIndex={-1} ref={heading}>Ingrédients</h2>
-    {results.items.length > 0 && <ul ref={list}>{results.items.map(item =>
-      <li key={item.ingredientId} tabIndex={-1}>
-        <span>{item.ingredientName}</span><span>{item.quantity}</span>
-      </li>)}</ul>}
-    {results.pending && <p role="status">Chargement des ingrédients…</p>}
-    {results.failed && <p role="alert">Impossible de charger les ingrédients.</p>}
-    {results.current && !results.items.length && !results.action && <p>Aucun ingrédient.</p>}
-    <PageAction results={results} query={id} list={list} fallback={heading} label="Plus d’ingrédients" />
-  </section>;
-}
 
 function Preparation({ id }: { id: string }) {
   const heading = useRef<HTMLHeadingElement>(null);
@@ -78,6 +60,6 @@ export function RecipeDetail({ id, validation = 0 }: { id: string; validation?: 
       </div>
       {!missing && <div className="recipe-illustration"><img src={placeholder} alt="" /></div>}
     </div>
-    {!missing && <div className="recipe-sections"><Ingredients id={id} /><Preparation id={id} /></div>}
+    {!missing && <div className="recipe-sections"><RecipeIngredients id={id} validation={validation} /><Preparation id={id} /></div>}
   </article>;
 }

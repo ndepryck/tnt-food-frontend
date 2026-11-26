@@ -33,7 +33,13 @@ main:has(> .catalogue) { max-width: 90rem; padding-inline: clamp(1rem, 3.8vw, 4r
 .recipe-grid a:hover h2, .recipe-grid a:focus-visible h2 { text-decoration: underline; }
 .recipe-grid img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: .8rem; }
 .recipe-grid h2 { font: bold 1.4rem Georgia, serif; margin: 0; padding: .8rem 1rem 1rem; }
-.ingredient-picker { width: min(24rem,calc(100% - 4rem)); height: min(36rem, 78dvh); }
+.ingredient-picker {
+  --rule: 1px solid color-mix(in srgb, var(--olive) 28%, transparent);
+  width: min(24rem,calc(100% - 4rem)); height: min(36rem, 78dvh);
+  font: 1rem/1.5 system-ui, sans-serif; color: var(--olive); background: var(--cream); border: var(--rule); border-radius: .55rem;
+}
+.ingredient-picker::backdrop { background: color-mix(in srgb, var(--olive) 45%, transparent); }
+.ingredient-picker input { display: block; width: 100%; min-height: 44px; box-sizing: border-box; padding: .6rem .8rem; font: inherit; color: inherit; background: var(--cream); border: var(--rule); border-radius: .55rem; }
 .ingredient-picker[open] { display: flex; flex-direction: column; align-items: stretch; }
 .picker-results { flex: 1; min-height: 3rem; overflow-y: auto; scrollbar-gutter: stable; }
 .catalogue-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

@@ -1,23 +1,28 @@
 import { useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { HttpError } from "./http";
 import { IconButton } from "./IconButton";
+import { dialogKeyboard } from "./dialogKeyboard";
 
 interface Props {
   title: string; submitLabel: string; failure: string; close: () => void;
   write: () => Promise<void>;
   fields?: (pending: boolean) => ReactNode;
   confirmation?: string;
+  conflict?: string;
+  feedbackKey?: string;
   fallback?: RefObject<HTMLElement | null>;
 }
 
 // Save and confirmation dialogs share locking, feedback, dismissal and focus.
-export function WriteDialog({ title, submitLabel, failure, close, write, fields, confirmation, fallback }: Props) {
+export function WriteDialog({ title, submitLabel, failure, close, write, fields, confirmation, conflict, feedbackKey, fallback }: Props) {
   const titleId = useId();
   const messageId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const lock = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // A different write target invalidates old feedback, not the form or its focus.
+  useLayoutEffect(() => { setError(""); }, [feedbackKey]);
   useLayoutEffect(() => {
     const node = dialog.current!;
     const invoker = document.activeElement;
@@ -48,7 +53,8 @@ export function WriteDialog({ title, submitLabel, failure, close, write, fields,
     try {
       await write();
     } catch (cause) {
-      setError(cause instanceof HttpError && cause.status === 404 ? "Cet élément n’existe plus." :
+      setError(cause instanceof HttpError && cause.status === 409 && conflict ? conflict :
+        cause instanceof HttpError && cause.status === 404 ? "Cet élément n’existe plus." :
         cause instanceof HttpError && cause.status === 422 ? "Les données sont invalides. Vérifiez les champs." :
         `${failure} Veuillez réessayer.`);
       lock.current = false;
@@ -57,14 +63,7 @@ export function WriteDialog({ title, submitLabel, failure, close, write, fields,
   }
   return <dialog className="write-dialog" ref={dialog} aria-labelledby={titleId} aria-describedby={confirmation ? messageId : undefined}
     onCancel={event => { event.preventDefault(); cancel(); }}
-    onKeyDown={event => {
-      if (event.key === "Escape") { event.preventDefault(); cancel(); }
-      if (event.key !== "Tab") return;
-      const controls = event.currentTarget.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled)");
-      const first = controls[0], last = controls[controls.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-    }}>
+    onKeyDown={event => dialogKeyboard(event, cancel)}>
     <div className="dialog-top"><h2 id={titleId}>{title}</h2><IconButton icon="close" label="Fermer" blocked={busy} onClick={cancel} /></div>
     <form noValidate onSubmit={submit}>
       {fields?.(busy)}

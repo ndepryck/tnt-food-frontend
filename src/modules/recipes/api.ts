@@ -42,6 +42,28 @@ export function readRecipeIngredients(id: string, offset: number, signal: AbortS
   return requestJson<Page<RecipeIngredientResponse>>(`${recipes}/${encodeURIComponent(id)}/ingredients?limit=20&offset=${offset}`, { signal });
 }
 
+export async function readLinkedIngredients(id: string, signal: AbortSignal) {
+  const linked: Ingredient[] = [];
+  let offset: number | null = 0;
+  do {
+    const page: Page<RecipeIngredientResponse> = await readRecipeIngredients(id, offset, signal);
+    linked.push(...page.items.map(row => ({ id: row.ingredientId, name: row.ingredientName })));
+    offset = page.hasMore ? page.nextOffset : null;
+  } while (offset !== null);
+  return linked;
+}
+
+const memberships = (id: string) => `${recipes}/${encodeURIComponent(id)}/ingredients`;
+export function addRecipeIngredient(id: string, ingredientId: string, quantity: string) {
+  return requestJson<RecipeIngredientResponse[]>(memberships(id), jsonWrite("POST", [{ ingredientId, quantity }]));
+}
+export function updateRecipeIngredient(id: string, ingredientId: string, quantity: string) {
+  return requestJson<RecipeIngredientResponse>(`${memberships(id)}/${encodeURIComponent(ingredientId)}`, jsonWrite("PATCH", { quantity }));
+}
+export async function removeRecipeIngredient(id: string, ingredientId: string) {
+  await request(`${memberships(id)}/${encodeURIComponent(ingredientId)}`, { method: "DELETE" });
+}
+
 export async function readSteps(id: string, signal: AbortSignal) {
   const steps = await requestJson<RecipeStepResponse[]>(`${recipes}/${encodeURIComponent(id)}/steps`, { signal });
   return steps.sort((a, b) => a.position - b.position);

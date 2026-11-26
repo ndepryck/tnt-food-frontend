@@ -2,16 +2,47 @@ import { useLayoutEffect, useId, useMemo, useRef, useState } from "react";
 import { searchIngredients, type Ingredient, type IngredientSearch } from "./api";
 import { usePagedSearch } from "../../core/search/usePagedSearch";
 import { PageAction } from "./PageAction";
+import { useRead } from "../../core/useRead";
+import { RequestError } from "../../core/RequestError";
+import { dialogKeyboard } from "../../core/dialogKeyboard";
 
-export function IngredientPicker({ excluded, choose, close }: {
+interface PickerProps {
   excluded: Ingredient[];
   choose: (ingredient: Ingredient) => void;
   close: () => void;
-}) {
+  loadExcluded?: (signal: AbortSignal) => Promise<Ingredient[]>;
+}
+
+export function IngredientPicker({ excluded, choose, close, loadExcluded }: PickerProps) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const title = useId();
+  useLayoutEffect(() => {
+    const node = dialog.current!;
+    const opener = document.activeElement;
+    node.showModal();
+    return () => {
+      node.close();
+      if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
+    };
+  }, []);
+  return <dialog className="ingredient-picker" ref={dialog} aria-labelledby={title} onKeyDown={event => dialogKeyboard(event, close)}
+    onCancel={e => { e.preventDefault(); close(); }}>
+    <h2 id={title}>Choisir un ingrédient</h2>
+    {loadExcluded ? <MembershipSuggestions load={loadExcluded} choose={choose} /> : <Suggestions excluded={excluded} choose={choose} />}
+    <button type="button" className="outline" onClick={close}>Fermer</button>
+  </dialog>;
+}
+
+function MembershipSuggestions({ load, choose }: { load: NonNullable<PickerProps["loadExcluded"]>; choose: PickerProps["choose"] }) {
+  const { state, retry } = useRead(load);
+  if (state.status === "loading") return <p role="status">Vérification des ingrédients déjà associés…</p>;
+  if (state.status === "error") return <RequestError message="Impossible de vérifier les ingrédients déjà associés." retry={retry} />;
+  return <Suggestions excluded={state.data} choose={choose} />;
+}
+
+function Suggestions({ excluded, choose }: Pick<PickerProps, "excluded" | "choose">) {
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);
-  const title = useId();
   const [text, setText] = useState("");
   const query = useMemo<IngredientSearch>(() => ({
     limit: 10,
@@ -20,13 +51,7 @@ export function IngredientPicker({ excluded, choose, close }: {
   const results = usePagedSearch(searchIngredients, query);
   const available = results.failed && !results.current ? [] :
     results.items.filter(i => !excluded.some(selected => selected.id === i.id));
-  useLayoutEffect(() => {
-    const node = dialog.current!;
-    node.showModal();
-    return () => node.close();
-  }, []);
-  return <dialog className="ingredient-picker" ref={dialog} aria-labelledby={title} onCancel={e => { e.preventDefault(); close(); }}>
-    <h2 id={title}>Choisir un ingrédient</h2>
+  return <>
     <label>Rechercher un ingrédient
       <input ref={input} autoFocus value={text} onChange={e => setText(e.target.value)} />
     </label>
@@ -41,6 +66,5 @@ export function IngredientPicker({ excluded, choose, close }: {
       )}</ul>
       <PageAction results={results} query={query} list={list} fallback={input} label="Plus d’ingrédients" />
     </div>
-    <button className="outline" onClick={close}>Fermer</button>
-  </dialog>;
+  </>;
 }

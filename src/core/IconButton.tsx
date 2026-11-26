@@ -1,4 +1,5 @@
 const paths = {
+  unlink: "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM7 12h10",
   edit: "m4 16-1 5 5-1L20 8l-4-4L4 16Zm9-9 4 4",
   delete: "M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7",
   close: "m6 6 12 12M18 6 6 18",
